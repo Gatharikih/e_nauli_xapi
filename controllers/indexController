@@ -1,7 +1,32 @@
+const req = require('express/lib/request');
+
+const axios = require('axios').default;
+
 function login() { }
 function changePassword() { }
 function resetPassword() { }
-function createSacco() { }
+
+async function createSacco(req) {
+    let config = {
+        headers: {
+            'Authorization': "Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNDkyMDk3Zi1kZTRjLTQxNGQtYjU3Ni03NjAwNDE5ZjJhNWQiLCJzdWIiOiIzY2U1NmIwOC1hM2FiLTRmNzEtODEyNC04ZjU3N2M4MGI3OGUiLCJjbGkiOiIzY2U1NmIwOC1hM2FiLTRmNzEtODEyNC04ZjU3N2M4MGI3OGUiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJXZWJhcGkiLCJuYmYiOjE2NzExMDA3OTQsImV4cCI6MTY3MTEwNDM5NCwiaXNzIjoiY2FzaGxlc3MubGliZXJ0eWFmcmlrYS5jby5rZSIsImF1ZCI6IioubGliZXJ0eWFmcmlrYS5jby5rZSJ9.WbeUD6Hmze6T_VGEyYjOm1pKJr5PcVwZy2A4G6TY-_s"
+        }
+    }
+
+    try {
+        let data = req.body;
+        let newSacco = await axios.post('https://sandbox.enauli.com/v1/sacco', data, config);
+
+        console.log(newSacco.data);
+
+        return { status: newSacco.status, message: newSacco.data.data[0].saccoId };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    }
+}
+
 function editSacco() { }
 function addOfficial() { }
 function editOfficial() { }
@@ -29,8 +54,10 @@ exports.reset_password = (req, res) => {
     resetPassword();
 }
 
-exports.create_sacco = (req, res) => {
-    createSacco();
+exports.create_sacco = async (req, res) => {
+    let result = await createSacco(req);
+
+    res.status(result.status).send(result.message);
 }
 
 exports.edit_sacco = (req, res) => {
