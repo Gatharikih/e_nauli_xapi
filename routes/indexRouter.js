@@ -19,10 +19,14 @@ router.post('/password/reset', indexController.reset_password);
 
 /* SACCO MANAGEMENT */
 
+// TODO:  e-nauli api not deactivating
+/* deactivate a sacco */
+router.put('/sacco/status', indexController.edit_sacco);
+
 /* create sacco */
 router.post('/sacco', indexController.create_sacco);
 
-/* edit and/or deactivate a sacco */
+/* edit a sacco */
 router.put('/sacco', indexController.edit_sacco);
 
 /* create an official */
@@ -73,6 +77,9 @@ router.get('/sacco/:sacco_id/vehicles', indexController.get_sacco_vehicles);
 
 /* END FLEET MANAGEMENT */
 
+
+/* get e-nauli token*/
+router.get('/token', indexController.token);
 
 /* test route */
 router.get('/test', indexController.test);

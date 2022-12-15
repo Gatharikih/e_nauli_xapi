@@ -2,20 +2,41 @@ const req = require('express/lib/request');
 
 const axios = require('axios').default;
 
+const baseURL = 'https://sandbox.enauli.com/v1';
+
 function login() { }
 function changePassword() { }
 function resetPassword() { }
 
-async function createSacco(req) {
-    let config = {
-        headers: {
-            'Authorization': "Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNDkyMDk3Zi1kZTRjLTQxNGQtYjU3Ni03NjAwNDE5ZjJhNWQiLCJzdWIiOiIzY2U1NmIwOC1hM2FiLTRmNzEtODEyNC04ZjU3N2M4MGI3OGUiLCJjbGkiOiIzY2U1NmIwOC1hM2FiLTRmNzEtODEyNC04ZjU3N2M4MGI3OGUiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJXZWJhcGkiLCJuYmYiOjE2NzExMDA3OTQsImV4cCI6MTY3MTEwNDM5NCwiaXNzIjoiY2FzaGxlc3MubGliZXJ0eWFmcmlrYS5jby5rZSIsImF1ZCI6IioubGliZXJ0eWFmcmlrYS5jby5rZSJ9.WbeUD6Hmze6T_VGEyYjOm1pKJr5PcVwZy2A4G6TY-_s"
-        }
-    }
-
+async function generateEnauliToken() {
     try {
+        let data = {
+            "apiKey": "3ce56b08-a3ab-4f71-8124-8f577c80b78e",
+            "appSecret": "1F7C8BC2357640E182BAAAC5212DE545"
+        }
+
+        let newSacco = await axios.post(baseURL + '/auth/token', data);
+
+        console.log(newSacco.data);
+
+        return { status: newSacco.status, message: newSacco.data.data[0].accessToken };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    }
+}
+
+async function createSacco(req) {
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
         let data = req.body;
-        let newSacco = await axios.post('https://sandbox.enauli.com/v1/sacco', data, config);
+        let newSacco = await axios.post(baseURL + '/sacco', data, config);
 
         console.log(newSacco.data);
 
@@ -27,8 +48,69 @@ async function createSacco(req) {
     }
 }
 
-function editSacco() { }
-function addOfficial() { }
+async function editSacco(req) {
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let data = req.body;
+        let newSacco = await axios.put(baseURL + '/sacco', data, config);
+
+        console.log(newSacco.data);
+
+        return { status: newSacco.status, message: newSacco.data.data[0].saccoId };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    }
+}
+
+async function deactivateSacco(req) {
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let data = req.body;
+        let newSacco = await axios.put(baseURL + '/sacco/status', data, config);
+
+        console.log(newSacco.data);
+
+        return { status: newSacco.status, message: newSacco.data.data[0].saccoId };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    }
+}
+
+async function addOfficial(req) { 
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let data = req.body;
+        let newSacco = await axios.put(baseURL + '/sacco/status', data, config);
+
+        console.log(newSacco.data);
+
+        return { status: newSacco.status, message: newSacco.data.data[0] };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    }
+}
+
 function editOfficial() { }
 function getOfficials() { }
 function addStation() { }
@@ -54,18 +136,35 @@ exports.reset_password = (req, res) => {
     resetPassword();
 }
 
+exports.token = async (req, res) => {
+    let result = await generateEnauliToken();
+
+    res.status(result.status).send(result.message);
+}
+
+
 exports.create_sacco = async (req, res) => {
     let result = await createSacco(req);
 
     res.status(result.status).send(result.message);
 }
 
-exports.edit_sacco = (req, res) => {
-    editSacco();
+exports.edit_sacco = async (req, res) => {
+    let result = await editSacco(req);
+
+    res.status(result.status).send(result.message);
 }
 
-exports.add_official = (req, res) => {
-    addOfficial();
+exports.deactivate_sacco = async (req, res) => {
+    let result = await deactivateSacco(req);
+
+    res.status(result.status).send(result.message);
+}
+
+exports.add_official = async (req, res) => {
+    let result = await addOfficial(req);
+
+    res.status(result.status).send(result.message);
 }
 
 exports.edit_official = (req, res) => {
@@ -118,5 +217,7 @@ exports.get_sacco_vehicles = (req, res) => {
 
 
 exports.test = (req, res) => {
-    res.status(200).send('Test route working!!');
+    console.log(req.headers.authorization);
+
+    ; res.status(200).send('Test route working!!');
 }
