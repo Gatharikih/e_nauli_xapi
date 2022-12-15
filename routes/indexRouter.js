@@ -29,11 +29,12 @@ router.post('/sacco', indexController.create_sacco);
 /* edit a sacco */
 router.put('/sacco', indexController.edit_sacco);
 
+// TODO: always displaying error - MsisdnLog with Msisdn 254721146559 could not be found
 /* create an official */
-router.post('/sacco/add_official', indexController.add_official);
+router.post('/sacco/official', indexController.add_official);
 
 /* deactivate and/or edit an official's details */
-router.put('/sacco/:official_id', indexController.edit_official);
+router.put('/sacco/official', indexController.edit_official);
 
 // TODO: add offset, page size
 /* get a list of officials */

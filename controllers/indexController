@@ -90,7 +90,7 @@ async function deactivateSacco(req) {
     }
 }
 
-async function addOfficial(req) { 
+async function addOfficial(req) {
     try {
         let config = {
             headers: {
@@ -99,7 +99,28 @@ async function addOfficial(req) {
         }
 
         let data = req.body;
-        let newSacco = await axios.put(baseURL + '/sacco/status', data, config);
+        let newSacco = await axios.post(baseURL + '/sacco/addOfficial', data, config);
+
+        console.log(newSacco);
+
+        return { status: newSacco.status, message: newSacco.data };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    }
+}
+
+async function editOfficial(req) { 
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let data = req.body;
+        let newSacco = await axios.put(baseURL + '/sacco/official', data, config);
 
         console.log(newSacco.data);
 
@@ -111,7 +132,6 @@ async function addOfficial(req) {
     }
 }
 
-function editOfficial() { }
 function getOfficials() { }
 function addStation() { }
 function editStation() { }
@@ -167,8 +187,10 @@ exports.add_official = async (req, res) => {
     res.status(result.status).send(result.message);
 }
 
-exports.edit_official = (req, res) => {
-    editOfficial();
+exports.edit_official = async (req, res) => {
+    let result = await editOfficial(req);
+
+    res.status(result.status).send(result.message);
 }
 
 exports.get_officials = (req, res) => {
@@ -219,5 +241,5 @@ exports.get_sacco_vehicles = (req, res) => {
 exports.test = (req, res) => {
     console.log(req.headers.authorization);
 
-    ; res.status(200).send('Test route working!!');
+    res.status(200).send('Test route working!!');
 }
