@@ -11,7 +11,10 @@ async function loginUser(req) {
             }
         }
 
-        let data = req.body;
+        let data = {
+            'emailOrPhoneNumberOrId': req.body.phone || req.body.emailOrPhoneNumberOrId,
+            'pin': req.body.pwd || req.body.pin
+        }
 
         let user = await axios.post(baseURL + '/user/login', data, config);
 
