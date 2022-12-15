@@ -5,9 +5,11 @@ const baseURL = 'https://sandbox.enauli.com/v1';
 
 async function loginUser(req) { 
     try {
+        let token = await generateEnauliToken();
+
         let config = {
             headers: {
-                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+                'Authorization': "Bearer " + token.message 
             }
         }
 
@@ -15,6 +17,8 @@ async function loginUser(req) {
             'emailOrPhoneNumberOrId': req.body.phone || req.body.emailOrPhoneNumberOrId,
             'pin': req.body.pwd || req.body.pin
         }
+
+        console.log(data);
 
         let user = await axios.post(baseURL + '/user/login', data, config);
 
