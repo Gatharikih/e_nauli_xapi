@@ -33,8 +33,11 @@ router.put('/sacco', indexController.edit_sacco);
 /* create an official */
 router.post('/sacco/official', indexController.add_official);
 
-/* deactivate and/or edit an official's details */
+/* edit an official's details */
 router.put('/sacco/official', indexController.edit_official);
+
+/* activate/deactivate an official */
+router.put('/sacco/official/status', indexController.update_official_status);
 
 // TODO: add offset, page size
 /* get a list of officials */
@@ -61,7 +64,7 @@ router.get('/sacco/balance', indexController.get_balance);
 /* FLEET MANAGEMENT */
 
 /* add vehicle to sacco */
-router.post('/sacco/vehicle', indexController.add_vehicle);
+router.post('/vehicle', indexController.add_vehicle);
 
 /* edit vehicle in sacco */
 router.put('/sacco/vehicle', indexController.edit_vehicle);

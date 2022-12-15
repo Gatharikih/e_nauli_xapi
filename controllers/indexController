@@ -132,13 +132,75 @@ async function editOfficial(req) {
     }
 }
 
-function getOfficials() { }
+async function updateOfficialStatus(req) {
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let data = req.body;
+        let newSacco = await axios.put(baseURL + '/sacco/official/status', data, config);
+
+        console.log(newSacco.data);
+
+        return { status: newSacco.status, message: newSacco.data.data[0] };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    }
+}
+
+async function getOfficials(req) { 
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let newSacco = await axios.get(baseURL + '/sacco/official/list', config);
+
+        console.log(newSacco.data);
+
+        return { status: newSacco.status, message: newSacco.data.data };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    }
+}
+
 function addStation() { }
 function editStation() { }
 function chargeStation() { }
 function editCharge() { }
 function getBalance() { }
-function addVehicle() { }
+
+async function addVehicle(req) {
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let data = req.body;
+
+        let newVehicle = await axios.get(baseURL + '/vehicle', data, config);
+
+        console.log(newVehicle.data);
+
+        return { status: newVehicle.status, message: newVehicle.data.data };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    }
+ }
+
 function editVehicle() { }
 function addOperator() { }
 function editOperator() { }
@@ -193,8 +255,16 @@ exports.edit_official = async (req, res) => {
     res.status(result.status).send(result.message);
 }
 
-exports.get_officials = (req, res) => {
-    getOfficials();
+exports.update_official_status = async (req, res) => {
+    let result = await updateOfficialStatus(req);
+
+    res.status(result.status).send(result.message);
+}
+
+exports.get_officials = async (req, res) => {
+    let result = await getOfficials(req);
+
+    res.status(result.status).send(result.message);
 }
 
 exports.add_station = (req, res) => {
@@ -217,8 +287,10 @@ exports.get_balance = (req, res) => {
     getBalance();
 }
 
-exports.add_vehicle = (req, res) => {
-    addVehicle();
+exports.add_vehicle = async (req, res) => {
+    let result = await addVehicle(req);
+
+    res.status(result.status).send(result.message);
 }
 
 exports.edit_vehicle = (req, res) => {
