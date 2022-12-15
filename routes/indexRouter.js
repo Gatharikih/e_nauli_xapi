@@ -6,13 +6,13 @@ let indexController = require('../controllers/indexController');
 /* USER MANAGEMENT */
 
 /* user login with phone and PIN */
-router.post('/login', indexController.login);
+router.post('/user/login', indexController.login_user);
 
 /* reset user password */
-router.post('/password/change', indexController.change_password);
+router.post('/user/password/change', indexController.change_password);
 
 /* reset user password */
-router.post('/password/reset', indexController.reset_password);
+router.post('/user/password/reset', indexController.reset_password);
 
 /* END USER MANAGEMENT */
 
@@ -63,6 +63,7 @@ router.get('/sacco/balance', indexController.get_balance);
 
 /* FLEET MANAGEMENT */
 
+// TODO: has an issue - unauthorized even with valid token
 /* add vehicle to sacco */
 router.post('/vehicle', indexController.add_vehicle);
 

@@ -1,11 +1,51 @@
 const req = require('express/lib/request');
-
 const axios = require('axios').default;
 
 const baseURL = 'https://sandbox.enauli.com/v1';
 
-function login() { }
-function changePassword() { }
+async function loginUser(req) { 
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let data = req.body;
+
+        let user = await axios.post(baseURL + '/user/login', data, config);
+
+        console.log(user.data);
+
+        return { status: user.status, message: user.data.data[0] };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    }
+}
+
+async function changePassword(req) {
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let data = req.body;
+
+        let user = await axios.post(baseURL + '/user/changePassword', data, config);
+
+        console.log(user.data);
+
+        return { status: user.status, message: user.data.data[0] };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    } }
+
 function resetPassword() { }
 
 async function generateEnauliToken() {
@@ -189,11 +229,11 @@ async function addVehicle(req) {
 
         let data = req.body;
 
-        let newVehicle = await axios.get(baseURL + '/vehicle', data, config);
+        let newVehicle = await axios.post(baseURL + '/vehicle', data, config);
 
         console.log(newVehicle.data);
 
-        return { status: newVehicle.status, message: newVehicle.data.data };
+        return { status: newVehicle.status, message: newVehicle.data.data[0].vehicleId };
     } catch (error) {
         console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
 
@@ -206,12 +246,16 @@ function addOperator() { }
 function editOperator() { }
 function getVehiclesInSacco() { }
 
-exports.login = (req, res) => {
-    login();
+exports.login_user = async (req, res) => {
+    let result = await loginUser(req);
+
+    res.status(result.status).send(result.message);
 }
 
-exports.change_password = (req, res) => {
-    changePassword();
+exports.change_password = async (req, res) => {
+    let result = await changePassword(req);
+
+    res.status(result.status).send(result.message);
 }
 
 exports.reset_password = (req, res) => {
