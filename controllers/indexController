@@ -83,6 +83,9 @@ async function createSacco(req) {
         }
 
         let data = req.body;
+
+        console.log(data);
+        
         let newSacco = await axios.post(baseURL + '/sacco', data, config);
 
         console.log(newSacco.data);
