@@ -1,3 +1,95 @@
+function login() { }
+function changePassword() { }
+function resetPassword() { }
+function createSacco() { }
+function editSacco() { }
+function addOfficial() { }
+function editOfficial() { }
+function getOfficials() { }
+function addStation() { }
+function editStation() { }
+function chargeStation() { }
+function editCharge() { }
+function getBalance() { }
+function addVehicle() { }
+function editVehicle() { }
+function addOperator() { }
+function editOperator() { }
+function getVehiclesInSacco() { }
+
+exports.login = (req, res) => {
+    login();
+}
+
+exports.change_password = (req, res) => {
+    changePassword();
+}
+
+exports.reset_password = (req, res) => {
+    resetPassword();
+}
+
+exports.create_sacco = (req, res) => {
+    createSacco();
+}
+
+exports.edit_sacco = (req, res) => {
+    editSacco();
+}
+
+exports.add_official = (req, res) => {
+    addOfficial();
+}
+
+exports.edit_official = (req, res) => {
+    editOfficial();
+}
+
+exports.get_officials = (req, res) => {
+    getOfficials();
+}
+
+exports.add_station = (req, res) => {
+    addStation();
+}
+
+exports.edit_station = (req, res) => {
+    editStation();
+}
+
+exports.charge_station = (req, res) => {
+    chargeStation();
+}
+
+exports.edit_charge = (req, res) => {
+    editCharge();
+}
+
+exports.get_balance = (req, res) => {
+    getBalance();
+}
+
+exports.add_vehicle = (req, res) => {
+    addVehicle();
+}
+
+exports.edit_vehicle = (req, res) => {
+    editVehicle();
+}
+
+exports.add_operator = (req, res) => {
+    addOperator();
+}
+
+exports.edit_operator = (req, res) => {
+    editOperator();
+}
+
+exports.get_sacco_vehicles = (req, res) => {
+    getVehiclesInSacco();
+}
+
+
 exports.test = (req, res) => {
     res.status(200).send('Test route working!!');
 }
