@@ -26,6 +26,9 @@ router.put('/sacco/status', indexController.edit_sacco);
 /* create sacco */
 router.post('/sacco', indexController.create_sacco);
 
+/* search sacco */
+router.get('/sacco/:id', indexController.search_sacco);
+
 /* edit a sacco */
 router.put('/sacco', indexController.edit_sacco);
 

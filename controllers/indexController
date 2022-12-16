@@ -98,6 +98,30 @@ async function createSacco(req) {
     }
 }
 
+async function searchSacco(req) {
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let id = req.params.id;
+
+        console.log(id);
+
+        let newSacco = await axios.get(baseURL + '/sacco/' + id, config);
+
+        console.log(newSacco.data.data[0]);
+
+        return { status: newSacco.status, message: newSacco.data.data[0] };
+    } catch (error) {
+        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+
+        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    }
+}
+
 async function editSacco(req) {
     try {
         let config = {
@@ -280,6 +304,12 @@ exports.token = async (req, res) => {
 
 exports.create_sacco = async (req, res) => {
     let result = await createSacco(req);
+
+    res.status(result.status).send(result.message);
+}
+
+exports.search_sacco = async (req, res) => {
+    let result = await searchSacco(req);
 
     res.status(result.status).send(result.message);
 }
