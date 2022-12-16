@@ -1,7 +1,7 @@
 {
   "name": "e-nauli-xapi",
   "version": "1.0.0",
-  "description": "e-nauli experience API. Documentation can be found at https://documenter.getpostman.com/view/7709834/2s8YzXuKNC",
+  "description": "e-nauli experience API. Documentation can be found at https://documenter.getpostman.com/view/7709834/2s8YzXuKNC.",
   "private": true,
   "scripts": {
     "start": "SET NODE_ENV=development && node ./bin/e_nauli",
