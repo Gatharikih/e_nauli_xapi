@@ -149,11 +149,11 @@ async function addOfficial(req) {
         }
 
         let data = req.body;
-        let newSacco = await axios.post(baseURL + '/sacco/addOfficial', data, config);
+        let newOfficial = await axios.post(baseURL + '/sacco/addOfficial', data, config);
 
-        console.log(newSacco);
+        console.log(newOfficial.data.data[0]);
 
-        return { status: newSacco.status, message: newSacco.data };
+        return { status: newOfficial.status, message: newOfficial.data.data[0].saccoOfficialId };
     } catch (error) {
         console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
 
@@ -277,7 +277,6 @@ exports.token = async (req, res) => {
 
     res.status(result.status).send(result.message);
 }
-
 
 exports.create_sacco = async (req, res) => {
     let result = await createSacco(req);
