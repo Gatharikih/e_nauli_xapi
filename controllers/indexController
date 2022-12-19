@@ -3,13 +3,13 @@ const axios = require('axios').default;
 
 const baseURL = 'https://sandbox.enauli.com/v1';
 
-async function loginUser(req) { 
-    try {
-        let token = await generateEnauliToken();
+async function loginUser(req) {
+    let token = await generateEnauliToken();
 
+    if (token.status == 200) {
         let config = {
             headers: {
-                'Authorization': "Bearer " + token.message 
+                'Authorization': "Bearer " + token.message
             }
         }
 
@@ -22,13 +22,9 @@ async function loginUser(req) {
 
         let user = await axios.post(baseURL + '/user/login', data, config);
 
-        console.log(user.data);
-
         return { status: user.status, message: user.data.data[0] };
-    } catch (error) {
-        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
-
-        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+    } else {
+        return { status: token.status, message: token.message };
     }
 }
 
@@ -51,7 +47,8 @@ async function changePassword(req) {
         console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
 
         return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
-    } }
+    }
+}
 
 function resetPassword() { }
 
@@ -66,11 +63,11 @@ async function generateEnauliToken() {
 
         console.log(newSacco.data);
 
-        return { status: newSacco.status, message: newSacco.data.data[0].accessToken };
+        return { status: 200, message: newSacco.data.data[0].accessToken };
     } catch (error) {
-        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+        console.log({ 500: error?.message || error?.response?.statusText });
 
-        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+        return { status: 500, message: error?.message || error?.response?.statusText };
     }
 }
 
@@ -85,7 +82,7 @@ async function createSacco(req) {
         let data = req.body;
 
         console.log(data);
-        
+
         let newSacco = await axios.post(baseURL + '/sacco', data, config);
 
         console.log(newSacco.data);
@@ -185,7 +182,7 @@ async function addOfficial(req) {
     }
 }
 
-async function editOfficial(req) { 
+async function editOfficial(req) {
     try {
         let config = {
             headers: {
@@ -227,7 +224,7 @@ async function updateOfficialStatus(req) {
     }
 }
 
-async function getOfficials(req) { 
+async function getOfficials(req) {
     try {
         let config = {
             headers: {
@@ -273,7 +270,7 @@ async function addVehicle(req) {
 
         return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
     }
- }
+}
 
 function editVehicle() { }
 function addOperator() { }
@@ -282,8 +279,13 @@ function getVehiclesInSacco() { }
 
 exports.login_user = async (req, res) => {
     let result = await loginUser(req);
+    console.log(result);
 
-    res.status(result.status).send(result.message);
+    if (result.status == 200) {
+        res.status(result.status).send(result.message);
+    } else {
+        res.status(result.status).end();   
+    }
 }
 
 exports.change_password = async (req, res) => {
