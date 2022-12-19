@@ -18,8 +18,6 @@ async function loginUser(req) {
             'pin': req.body.pwd || req.body.pin
         }
 
-        console.log(data);
-
         let user = await axios.post(baseURL + '/user/login', data, config);
 
         return { status: user.status, message: user.data.data[0] };
@@ -59,11 +57,9 @@ async function generateEnauliToken() {
             "appSecret": "1F7C8BC2357640E182BAAAC5212DE545"
         }
 
-        let newSacco = await axios.post(baseURL + '/auth/token', data);
+        let newToken = await axios.post(baseURL + '/auth/token', data);
 
-        console.log(newSacco.data);
-
-        return { status: 200, message: newSacco.data.data[0].accessToken };
+        return { status: 200, message: newToken.data.data[0].accessToken };
     } catch (error) {
         console.log({ 500: error?.message || error?.response?.statusText });
 
@@ -105,17 +101,15 @@ async function searchSacco(req) {
 
         let id = req.params.id;
 
-        console.log(id);
-
         let newSacco = await axios.get(baseURL + '/sacco/' + id, config);
 
-        console.log(newSacco.data.data[0]);
+        // console.log(newSacco.data.data[0]);
 
         return { status: newSacco.status, message: newSacco.data.data[0] };
     } catch (error) {
-        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+        console.log({ 500: error?.message || error?.response?.statusText });
 
-        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+        return { status: 500, message: error?.message || error?.response?.statusText };
     }
 }
 
@@ -284,7 +278,7 @@ exports.login_user = async (req, res) => {
     if (result.status == 200) {
         res.status(result.status).send(result.message);
     } else {
-        res.status(result.status).end();   
+        res.status(result.status).end();
     }
 }
 
@@ -311,9 +305,22 @@ exports.create_sacco = async (req, res) => {
 }
 
 exports.search_sacco = async (req, res) => {
-    let result = await searchSacco(req);
+    let sacco = await searchSacco(req);
 
-    res.status(result.status).send(result.message);
+    if (sacco.status == 200) {
+        let response = {
+            name: sacco.message.name,
+            address: sacco.message.address,
+            contactPerson: sacco.message.contactPerson,
+            saccoId: sacco.message.saccoId,
+        }
+
+        console.log(response);
+
+        res.status(sacco.status).send(response);
+    } else {
+        res.status(sacco.status).send(sacco.message);
+    }
 }
 
 exports.edit_sacco = async (req, res) => {
