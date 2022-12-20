@@ -65,7 +65,6 @@ router.get('/sacco/balance', indexController.get_balance);
 
 /* FLEET MANAGEMENT */
 
-// TODO: has an issue - unauthorized even with valid token
 /* add vehicle to sacco */
 router.post('/vehicle', indexController.add_vehicle);
 
@@ -78,7 +77,6 @@ router.post('/sacco/operator', indexController.add_operator);
 /* edit operator in vehicle */
 router.put('/sacco/operator', indexController.edit_operator);
 
-// TODO: add offset, page size
 /* get list of vehicles in sacco */
 router.get('/sacco/:sacco_id/vehicles', indexController.get_sacco_vehicles);
 

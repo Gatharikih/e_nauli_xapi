@@ -277,20 +277,39 @@ async function addVehicle(req) {
 
         let newVehicle = await axios.post(baseURL + '/vehicle', data, config);
 
-        console.log(newVehicle.data);
+        console.log(newVehicle.data.data[0]);
 
         return { status: newVehicle.status, message: newVehicle.data.data[0].vehicleId };
     } catch (error) {
-        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+        console.log({ 500: error?.message || error?.response?.statusText });
 
-        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+        return { status: 500, message: error?.message || error?.response?.statusText };
     }
 }
 
 function editVehicle() { }
 function addOperator() { }
 function editOperator() { }
-function getVehiclesInSacco() { }
+
+async function getVehiclesInSacco(sacco_id) {
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let vehiclesInSacco = await axios.get(baseURL + 'sacco' + sacco_id +'/vehicle', config);
+
+        console.log(vehiclesInSacco.data.data[0]);
+
+        return { status: vehiclesInSacco.status, message: vehiclesInSacco.data.data[0] };
+    } catch (error) {
+        console.log({ 500: error?.message || error?.response?.statusText });
+
+        return { status: 500, message: error?.message || error?.response?.statusText };
+    }
+ }
 
 exports.login_user = async (req, res) => {
     let result = await loginUser(req);
@@ -433,7 +452,9 @@ exports.edit_operator = (req, res) => {
 }
 
 exports.get_sacco_vehicles = (req, res) => {
-    getVehiclesInSacco();
+    let result = await getVehiclesInSacco(req);
+
+    res.status(result.status).send(result.message);
 }
 
 
