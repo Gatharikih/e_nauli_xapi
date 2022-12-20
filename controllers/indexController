@@ -103,7 +103,7 @@ async function searchSacco(req) {
 
         let newSacco = await axios.get(baseURL + '/sacco/' + id, config);
 
-        // console.log(newSacco.data.data[0]);
+        console.log(newSacco.data.data[0]);
 
         return { status: newSacco.status, message: newSacco.data.data[0] };
     } catch (error) {
@@ -124,9 +124,30 @@ async function editSacco(req) {
         let data = req.body;
         let newSacco = await axios.put(baseURL + '/sacco', data, config);
 
+        console.log(newSacco.data.data[0]);
+
+        return { status: newSacco.status, message: newSacco.data.data[0] };
+    } catch (error) {
+        console.log({ 500: error?.message || error?.response?.statusText });
+
+        return { status: 500, message: error?.message || error?.response?.statusText };
+    }
+}
+
+async function updateSaccoStatus(req) {
+    try {
+        let config = {
+            headers: {
+                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
+            }
+        }
+
+        let data = req.body;
+        let newSacco = await axios.put(baseURL + '/sacco/status', data, config);
+
         console.log(newSacco.data);
 
-        return { status: newSacco.status, message: newSacco.data.data[0].saccoId };
+        return { status: newSacco.status, message: newSacco.data.data[0] };
     } catch (error) {
         console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
 
@@ -307,20 +328,34 @@ exports.create_sacco = async (req, res) => {
 exports.search_sacco = async (req, res) => {
     let sacco = await searchSacco(req);
 
+    console.log(sacco)
+
     if (sacco.status == 200) {
-        let response = {
-            name: sacco.message.name,
-            address: sacco.message.address,
-            contactPerson: sacco.message.contactPerson,
-            saccoId: sacco.message.saccoId,
+        let flag = req.headers['x-data-flag'];
+        
+        if (flag == '0') {
+            let response = {
+                name: sacco.message.name,
+                address: sacco.message.address,
+                contactPerson: sacco.message.contactPerson,
+                saccoId: sacco.message.saccoId,
+            }
+
+            console.log(response);
+
+            res.status(sacco.status).send(response);
+        } else {
+            res.status(sacco.status).send(sacco.message); 
         }
-
-        console.log(response);
-
-        res.status(sacco.status).send(response);
     } else {
-        res.status(sacco.status).send(sacco.message);
+        res.status(sacco.status).send(sacco);
     }
+}
+
+exports.update_sacco_status = async (req, res) => {
+    let result = await updateSaccoStatus(req);
+
+    res.status(result.status).send(result.message);
 }
 
 exports.edit_sacco = async (req, res) => {

@@ -19,18 +19,17 @@ router.post('/user/password/reset', indexController.reset_password);
 
 /* SACCO MANAGEMENT */
 
-// TODO:  e-nauli api not deactivating
 /* deactivate a sacco */
-router.put('/sacco/status', indexController.edit_sacco);
+router.put('/sacco/status', indexController.update_sacco_status);
 
 /* create sacco */
 router.post('/sacco', indexController.create_sacco);
 
-/* search sacco */
-router.get('/sacco/:id', indexController.search_sacco);
-
 /* edit a sacco */
 router.put('/sacco', indexController.edit_sacco);
+
+/* search sacco */
+router.get('/sacco/:id', indexController.search_sacco);
 
 // TODO: always displaying error - MsisdnLog with Msisdn 254721146559 could not be found
 /* create an official */
