@@ -19,14 +19,14 @@ router.post('/user/password/reset', indexController.reset_password);
 
 /* SACCO MANAGEMENT */
 
+/* edit a sacco */
+router.put('/sacco', indexController.edit_sacco);
+
 /* deactivate a sacco */
 router.put('/sacco/status', indexController.update_sacco_status);
 
 /* create sacco */
 router.post('/sacco', indexController.create_sacco);
-
-/* edit a sacco */
-router.put('/sacco', indexController.edit_sacco);
 
 /* search sacco */
 router.get('/sacco/:id', indexController.search_sacco);

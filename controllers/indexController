@@ -63,7 +63,7 @@ async function generateEnauliToken() {
     } catch (error) {
         console.log({ 500: error?.message || error?.response?.statusText });
 
-        return { status: 500, message: error?.message || error?.response?.statusText };
+        return { status: error?.response?.status || 500, message: error?.response?.statusText || error?.message };
     }
 }
 
@@ -103,13 +103,18 @@ async function searchSacco(req) {
 
         let newSacco = await axios.get(baseURL + '/sacco/' + id, config);
 
-        console.log(newSacco.data.data[0]);
+        console.log(newSacco.data.data);
 
-        return { status: newSacco.status, message: newSacco.data.data[0] };
+        if (newSacco.data.data.length > 0) {
+            return { status: newSacco.status, message: newSacco.data.data[0] };
+        } else {
+            return { status: 404, message: `Sacco ${id} not found` };
+        }
     } catch (error) {
         console.log({ 500: error?.message || error?.response?.statusText });
+            // console.log({ [error?.response?.status]: error?.response?.statusText });
 
-        return { status: 500, message: error?.message || error?.response?.statusText };
+        return { status: error?.response?.status || 500, message: error?.response?.statusText || error?.message };
     }
 }
 
@@ -122,15 +127,16 @@ async function editSacco(req) {
         }
 
         let data = req.body;
+
         let newSacco = await axios.put(baseURL + '/sacco', data, config);
 
-        console.log(newSacco.data.data[0]);
+        // console.log(newSacco.data.data[0]);
 
         return { status: newSacco.status, message: newSacco.data.data[0] };
     } catch (error) {
-        console.log({ 500: error?.message || error?.response?.statusText });
+        console.log({ [error?.response?.status]: error?.response?.statusText });
 
-        return { status: 500, message: error?.message || error?.response?.statusText };
+        return { status: error?.response?.status || 500, message: error?.response?.statusText || error?.message };
     }
 }
 
@@ -145,7 +151,6 @@ async function updateSaccoStatus(req) {
         req.body.activate = req.body.activate == 'true' ? true : false;
 
         let data = req.body;
-        // console.log(data);
 
         let newSacco = await axios.put(baseURL + '/sacco/status', data, config);
 
@@ -155,7 +160,7 @@ async function updateSaccoStatus(req) {
     } catch (error) {
         console.log({ 500: error?.message || error?.response?.statusText });
 
-        return { status: 500, message: error?.message || error?.response?.statusText };
+        return { status: error?.response?.status || 500, message: error?.response?.statusText || error?.message };
     }
 }
 
@@ -266,7 +271,7 @@ async function addVehicle(req) {
     } catch (error) {
         console.log({ 500: error?.message || error?.response?.statusText });
 
-        return { status: 500, message: error?.message || error?.response?.statusText };
+        return { status: error?.response?.status || 500, message: error?.response?.statusText || error?.message };
     }
 }
 
@@ -282,7 +287,7 @@ async function getVehiclesInSacco(sacco_id) {
             }
         }
 
-        let vehiclesInSacco = await axios.get(baseURL + 'sacco' + sacco_id +'/vehicle', config);
+        let vehiclesInSacco = await axios.get(baseURL + 'sacco' + sacco_id + '/vehicle', config);
 
         console.log(vehiclesInSacco.data.data[0]);
 
@@ -290,16 +295,16 @@ async function getVehiclesInSacco(sacco_id) {
     } catch (error) {
         console.log({ 500: error?.message || error?.response?.statusText });
 
-        return { status: 500, message: error?.message || error?.response?.statusText };
+        return { status: error?.response?.status || 500, message: error?.response?.statusText || error?.message };
     }
- }
+}
 
 exports.login_user = async (req, res) => {
     let result = await loginUser(req);
     console.log(result);
 
     if (result.status == 200) {
-        res.status(result.status).send(result.message);
+        res.status(result.status).send({ message: result.message });
     } else {
         res.status(result.status).end();
     }
@@ -308,7 +313,7 @@ exports.login_user = async (req, res) => {
 exports.change_password = async (req, res) => {
     let result = await changePassword(req);
 
-    res.status(result.status).send(result.message);
+    res.status(result.status).send({ message: result.message });
 }
 
 exports.reset_password = (req, res) => {
@@ -318,23 +323,21 @@ exports.reset_password = (req, res) => {
 exports.token = async (req, res) => {
     let result = await generateEnauliToken();
 
-    res.status(result.status).send(result.message);
+    res.status(result.status).send({ message: result.message });
 }
 
 exports.create_sacco = async (req, res) => {
     let result = await createSacco(req);
 
-    res.status(result.status).send(result.message);
+    res.status(result.status).send({ message: result.message });
 }
 
 exports.search_sacco = async (req, res) => {
     let sacco = await searchSacco(req);
 
-    console.log(sacco)
-
     if (sacco.status == 200) {
         let flag = req.headers['x-data-flag'];
-        
+
         if (flag == '0') {
             let response = {
                 name: sacco.message.name,
@@ -344,11 +347,9 @@ exports.search_sacco = async (req, res) => {
                 isActive: sacco.message.isActive
             }
 
-            console.log(response);
-
             res.status(sacco.status).send(response);
         } else {
-            res.status(sacco.status).send(sacco.message); 
+            res.status(sacco.status).send(sacco.message);
         }
     } else {
         res.status(sacco.status).send(sacco);
@@ -358,37 +359,38 @@ exports.search_sacco = async (req, res) => {
 exports.update_sacco_status = async (req, res) => {
     let result = await updateSaccoStatus(req);
 
-    res.status(result.status).send({message: result.message});
+    res.status(result.status).send({ message: result.message });
 }
 
 exports.edit_sacco = async (req, res) => {
     let result = await editSacco(req);
+    console.log(result);
 
-    res.status(result.status).send(result.message);
+    res.status(result.status).send({ message: result.message });
 }
 
 exports.add_official = async (req, res) => {
     let result = await addOfficial(req);
 
-    res.status(result.status).send(result.message);
+    res.status(result.status).send({ message: result.message });
 }
 
 exports.edit_official = async (req, res) => {
     let result = await editOfficial(req);
 
-    res.status(result.status).send(result.message);
+    res.status(result.status).send({ message: result.message });
 }
 
 exports.update_official_status = async (req, res) => {
     let result = await updateOfficialStatus(req);
 
-    res.status(result.status).send(result.message);
+    res.status(result.status).send({ message: result.message });
 }
 
 exports.get_officials = async (req, res) => {
     let result = await getOfficials(req);
 
-    res.status(result.status).send(result.message);
+    res.status(result.status).send({ message: result.message });
 }
 
 exports.add_station = (req, res) => {
@@ -414,7 +416,7 @@ exports.get_balance = (req, res) => {
 exports.add_vehicle = async (req, res) => {
     let result = await addVehicle(req);
 
-    res.status(result.status).send(result.message);
+    res.status(result.status).send({ message: result.message });
 }
 
 exports.edit_vehicle = (req, res) => {
@@ -432,7 +434,7 @@ exports.edit_operator = (req, res) => {
 exports.get_sacco_vehicles = async (req, res) => {
     let result = await getVehiclesInSacco(req);
 
-    res.status(result.status).send(result.message);
+    res.status(result.status).send({ message: result.message });
 }
 
 
