@@ -128,15 +128,17 @@ async function editSacco(req) {
 
         let data = req.body;
 
+        // console.log(data);
+
         let newSacco = await axios.put(baseURL + '/sacco', data, config);
 
-        // console.log(newSacco.data.data[0]);
+        console.log(newSacco.data.data[0]);
 
         return { status: newSacco.status, message: newSacco.data.data[0] };
     } catch (error) {
-        console.log({ [error?.response?.status]: error?.response?.statusText });
+        console.log({ status: error?.response.data.status.code || error?.response?.status || 500, message: error?.response.data.status.message || error?.response?.statusText || error?.message });
 
-        return { status: error?.response?.status || 500, message: error?.response?.statusText || error?.message };
+        return { status: error?.response.data.status.code || error?.response?.status || 500, message: error?.response.data.status.message || error?.response?.statusText || error?.message };
     }
 }
 
@@ -364,9 +366,8 @@ exports.update_sacco_status = async (req, res) => {
 
 exports.edit_sacco = async (req, res) => {
     let result = await editSacco(req);
-    console.log(result);
 
-    res.status(result.status).send({ message: result.message });
+    res.status(result.status).send({ message: result.message?.saccoId });
 }
 
 exports.add_official = async (req, res) => {
