@@ -142,37 +142,20 @@ async function updateSaccoStatus(req) {
             }
         }
 
+        req.body.activate = req.body.activate == 'true' ? true : false;
+
         let data = req.body;
+        // console.log(data);
+
         let newSacco = await axios.put(baseURL + '/sacco/status', data, config);
 
-        console.log(newSacco.data);
+        console.log(newSacco.data.data);
 
         return { status: newSacco.status, message: newSacco.data.data[0] };
     } catch (error) {
-        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
+        console.log({ 500: error?.message || error?.response?.statusText });
 
-        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
-    }
-}
-
-async function deactivateSacco(req) {
-    try {
-        let config = {
-            headers: {
-                'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
-            }
-        }
-
-        let data = req.body;
-        let newSacco = await axios.put(baseURL + '/sacco/status', data, config);
-
-        console.log(newSacco.data);
-
-        return { status: newSacco.status, message: newSacco.data.data[0].saccoId };
-    } catch (error) {
-        console.log({ [error?.response?.data?.status?.code]: error?.response?.data?.status?.message || error?.response?.statusText });
-
-        return { status: error?.response?.status, message: error?.response?.data?.status?.message || error?.response?.statusText };
+        return { status: 500, message: error?.message || error?.response?.statusText };
     }
 }
 
@@ -358,6 +341,7 @@ exports.search_sacco = async (req, res) => {
                 address: sacco.message.address,
                 contactPerson: sacco.message.contactPerson,
                 saccoId: sacco.message.saccoId,
+                isActive: sacco.message.isActive
             }
 
             console.log(response);
@@ -374,17 +358,11 @@ exports.search_sacco = async (req, res) => {
 exports.update_sacco_status = async (req, res) => {
     let result = await updateSaccoStatus(req);
 
-    res.status(result.status).send(result.message);
+    res.status(result.status).send({message: result.message});
 }
 
 exports.edit_sacco = async (req, res) => {
     let result = await editSacco(req);
-
-    res.status(result.status).send(result.message);
-}
-
-exports.deactivate_sacco = async (req, res) => {
-    let result = await deactivateSacco(req);
 
     res.status(result.status).send(result.message);
 }
@@ -451,7 +429,7 @@ exports.edit_operator = (req, res) => {
     editOperator();
 }
 
-exports.get_sacco_vehicles = (req, res) => {
+exports.get_sacco_vehicles = async (req, res) => {
     let result = await getVehiclesInSacco(req);
 
     res.status(result.status).send(result.message);
