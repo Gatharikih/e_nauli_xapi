@@ -256,7 +256,7 @@ function editCharge() { }
 function getBalance() { }
 
 async function addVehicle(req) {
-    try {
+    try {        
         let config = {
             headers: {
                 'Authorization': "Bearer " + req.headers?.authorization.split(' ')[1]
@@ -281,7 +281,7 @@ function editVehicle() { }
 function addOperator() { }
 function editOperator() { }
 
-async function getVehiclesInSacco(sacco_id) {
+async function getVehiclesInSacco(req) {
     try {
         let config = {
             headers: {
@@ -289,11 +289,11 @@ async function getVehiclesInSacco(sacco_id) {
             }
         }
 
-        let vehiclesInSacco = await axios.get(baseURL + 'sacco' + sacco_id + '/vehicle', config);
+        let vehiclesInSacco = await axios.get(baseURL + '/sacco/' + req.params.sacco_id + '/vehicles', config);
 
-        console.log(vehiclesInSacco.data.data[0]);
+        console.log(vehiclesInSacco.data.data);
 
-        return { status: vehiclesInSacco.status, message: vehiclesInSacco.data.data[0] };
+        return { status: vehiclesInSacco.status, message: vehiclesInSacco.data.data };
     } catch (error) {
         console.log({ 500: error?.message || error?.response?.statusText });
 
